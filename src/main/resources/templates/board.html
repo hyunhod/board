@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>게시판</title>
+    <!-- Core theme CSS (includes Bootstrap) -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <!-- Font Awesome icons (free version) -->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Simple line icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css" rel="stylesheet" />
+    <!-- Google fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" />
+    <style>
+        .layout {
+            width: 100%;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        .layout input,
+        .layout textarea {
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+        .layout textarea {
+            min-height: 300px;
+        }
+        .layout button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .layout button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body id="page-top">
+<!-- Navigation -->
+<nav id="sidebar-wrapper">
+    <ul class="sidebar-nav">
+        <li class="sidebar-brand"><a href="#page-top">Home</a></li>
+        <li class="sidebar-nav-item"><a href="#about">About</a></li>
+        <li class="sidebar-nav-item"><a href="#services">Services</a></li>
+        <li class="sidebar-nav-item"><a href="#portfolio">Portfolio</a></li>
+        <li class="sidebar-nav-item"><a href="#contact">Contact</a></li>
+        <li class="sidebar-nav-item"><a href="/members/add">회원가입</a></li>
+        <li class="sidebar-nav-item"><a href="/members/login">로그인</a></li>
+        <li class="sidebar-nav-item"><a href="/members/findId">아이디 찾기</a></li>
+        <li class="sidebar-nav-item"><a href="/members/findPassword">비밀번호 찾기</a></li>
+    </ul>
+</nav>
+<!-- Header -->
+<header class="masthead d-flex align-items-center" style="background-image: url('/assets/img/portfolio-1.jpg');">
+    <div class="container px-4 px-lg-5 text-center">
+        <h1 class="mb-1">hyunho board</h1>
+    </div>
+</header>
+<!-- 게시판 폼 -->
+<section class="content-section bg-light" id="board">
+    <div class="layout">
+        <form action="/board/write/do" th:object="${board}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">제목</label>
+                <input type="text" id="title" name="title" th:field="*{title}" class="form-control" placeholder="제목을 입력하세요">
+
+            </div>
+            <div class="form-group">
+                <label for="content">내용</label>
+                <textarea id="content" name="content" th:field="*{content}" class="form-control" placeholder="내용을 입력하세요"></textarea>
+            </div>
+            <input type="file" name="file">
+            <button type="submit">등록</button>
+        </form>
+    </div>
+</section>
+<!-- Footer -->
+<footer class="footer text-center">
+    <div class="container px-4 px-lg-5">
+        <ul class="list-inline mb-5">
+            <li class="list-inline-item">
+                <a class="social-link rounded-circle text-white mr-3" href="#!"><i class="icon-social-facebook"></i></a>
+            </li>
+            <li class="list-inline-item">
+                <a class="social-link rounded-circle text-white mr-3" href="#!"><i class="icon-social-twitter"></i></a>
+            </li>
+            <li class="list-inline-item">
+                <a class="social-link rounded-circle text-white" href="#!"><i class="icon-social-github"></i></a>
+            </li>
+        </ul>
+        <p class="text-muted small mb-0">Copyright &copy; Your Website 2023</p>
+    </div>
+</footer>
+<!-- Scroll to Top Button -->
+<a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
+<!-- Bootstrap core JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Core theme JS -->
+<script src="js/scripts.js"></script>
+</body>
+</html>

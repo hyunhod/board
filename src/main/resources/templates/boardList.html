@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시판 목록</title>
+    <!-- Core theme CSS (includes Bootstrap) -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <!-- Font Awesome icons (free version) -->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Simple line icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css" rel="stylesheet" />
+    <!-- Google fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" />
+    <style>
+        .layout {
+            width: 100%;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .search-form {
+            margin-bottom: 20px;
+        }
+        .pagination {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .pagination a, .pagination strong {
+            margin: 0 5px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .pagination strong {
+            color: red;
+        }
+        .home-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .home-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <!-- 검색 폼 -->
+    <div class="search-form">
+        <form th:action="@{/board/list}" method="get">
+            <input type="text" name="searchK" placeholder="검색어를 입력하세요" />
+            <button type="submit">검색</button>
+        </form>
+    </div>
+
+    <!-- 게시판 목록 -->
+    <table>
+        <thead>
+        <tr>
+            <th>글번호</th>
+            <th>제목</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="board, iterStat: ${list}">
+            <td th:text="${totalCount-(nowP * pageSize + iterStat.index)}">1</td>
+            <td>
+                <a th:text="${board.title}" th:href="@{/board/view(id=${board.id})}"></a>
+                <a th:if="${member != null && board.author.id == member.id}" th:href="@{/board/delete(id=${board.id})}" >
+                    <button>삭제</button>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이지 네비게이션 -->
+    <div class="pagination">
+        <th:block th:each="page : ${#numbers.sequence(startP, endP)}">
+            <a th:if="${page != nowP}" th:href="@{/board/list(page=${page-1})}" th:text="${page}"></a>
+            <strong th:if="${page == nowP}" th:text="${page}"></strong>
+        </th:block>
+    </div>
+
+    <!-- 홈 버튼 -->
+    <form th:action="@{/members/home}" method="get">
+        <button type="submit" class="home-button">홈으로</button>
+    </form>
+</div>
+</body>
+</html>

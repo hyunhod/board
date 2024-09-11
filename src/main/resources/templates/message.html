@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var message = [[${message}]];<!--controller에서 메세지를 여기다전송해줄거임 그럼 여기메세지를 담아서-->
+    alert(message);<!--alert가 자바스크립트에서 화면에 뭔가 문자를 출력해주는거 메세지를 띄워줌.-->
+
+    location.replace([[${searchUrl}]]); <!--페이지를 이동시켜줄경로로 이동시켜줌-->
+    /*]]>*/
+</script>
+<body>
+</body>
+</html>

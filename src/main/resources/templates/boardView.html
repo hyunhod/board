@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>게시판</title>
+    <!-- Core theme CSS (includes Bootstrap) -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <!-- Font Awesome icons (free version) -->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Simple line icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css" rel="stylesheet"/>
+    <!-- Google fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .comment-form, .reply-form {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            background-color: #007bff;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .comment, .reply {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .reply {
+            margin-left: 20px;
+            border-left: 2px solid #007bff;
+            padding-left: 10px;
+        }
+
+        .like-icon {
+            cursor: pointer;
+            font-size: 1.2em;
+            margin-right: 5px;
+            color: #007bff; /* 따봉 아이콘 색상 (파란색) */
+        }
+
+        .like-icon:hover {
+            opacity: 0.7;
+        }
+
+        .reply-button, .reply-toggle-button {
+            cursor: pointer;
+            color: #007bff;
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 0.9em;
+        }
+
+        .reply-toggle-button {
+            display: block;
+            margin-top: 10px;
+        }
+
+        .reply-section {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .footer {
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+        }
+
+        .scroll-to-top:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${board.title}"></h1>
+    <p th:text="${board.content}"></p>
+    <a th:href="@{${board.filepath}}">파일보기</a>
+    <p th:text="${board.author != null ? '작성자: ' + board.author.name : '작성자: 알 수 없음'}"></p>
+
+    <!-- 댓글 작성 폼 -->
+    <form id="comment-form" th:action="@{/writeComment/{boardId}(boardId=${board.id})}" th:object="${comment}" method="post" class="comment-form">
+        <textarea id="content" th:field="*{content}" placeholder="댓글을 입력하세요"></textarea>
+        <input type="hidden" th:field="*{author.id}" th:value="${member.id}">
+        <button type="submit">댓글 작성</button>
+    </form>
+
+    <div>
+        <h3>댓글 목록</h3>
+        <ul id="comment-list">
+            <!-- 댓글 및 대댓글 목록 (일반댓글) -->
+            <li th:each="comment : ${comments}" class="comment" id="comment-${comment.id}">
+                <p>
+                    <span th:text="${comment.author.name}"></span>:
+                    <span th:text="${comment.content}"></span>
+
+                    <!-- 좋아요 -->
+                <form th:action="@{/likeComment/{commentId}(commentId=${comment.id})}" method="post" style="display:inline;">
+                    <input type="hidden" name="memberId" th:value="${member.id}"/>
+                    <span class="like-icon">&#128077;</span>
+                    <span th:text="${comment.likes}"></span>
+                </form>
+
+                <!-- 싫어요 -->
+                <form th:action="@{/unlikeComment/{commentId}(commentId=${comment.id})}" method="post" style="display:inline;">
+                    <input type="hidden" name="memberId" th:value="${member.id}"/>
+                    <span class="like-icon">&#128078;</span>
+                    <span th:text="${comment.unlikes}"></span>
+                </form>
+                </p>
+
+                <!-- 대댓글 작성 버튼 -->
+                <button class="reply-button" th:data-comment-id="${comment.id}">대댓글 작성</button>
+
+                <!-- 대댓글 작성 폼 (기본적으로 숨김) -->
+                <form th:id="'reply-form-'+${comment.id}" class="comment-form reply-form" th:action="@{/writeComment/{boardId}(boardId=${board.id})}" method="post">
+                    <input type="hidden" name="parentId" th:value="${comment.id}"/>
+                    <textarea name="content" placeholder="대댓글을 입력하세요"></textarea>
+                    <button type="submit">대댓글 작성</button>
+                </form>
+
+                <!-- 대댓글 표시 버튼 및 대댓글 목록 -->
+                <button class="reply-toggle-button" th:data-comment-id="${comment.id}">댓글 보기</button>
+                <div th:id="'reply-section-'+${comment.id}" class="reply-section">
+                    <ul>
+                        <!-- 대댓글 목록 (재귀적으로 표시) -->
+                        <li th:each="reply : ${comment.replies}" class="reply">
+                            <p>
+                                <span th:text="${reply.author.name}"></span>:
+                                <span th:text="${reply.content}"></span>
+
+                                <!-- 좋아요 -->
+                            <form th:action="@{/likeComment/{commentId}(commentId=${reply.id})}" method="post" style="display:inline;">
+                                <input type="hidden" name="memberId" th:value="${member.id}"/>
+                                <span class="like-icon">&#128077;</span>
+                                <span th:text="${reply.likes}"></span>
+                            </form>
+
+                            <!-- 싫어요 -->
+                            <form th:action="@{/unlikeComment/{commentId}(commentId=${reply.id})}" method="post" style="display:inline;">
+                                <input type="hidden" name="memberId" th:value="${member.id}"/>
+                                <span class="like-icon">&#128078;</span>
+                                <span th:text="${reply.unlikes}"></span>
+                            </form>
+                            </p>
+
+                            <!-- 대댓글 작성 버튼 -->
+                            <button class="reply-button" th:data-comment-id="${reply.id}">대댓글 작성</button>
+
+                            <!-- 대댓글 작성 폼 (기본적으로 숨김) -->
+                            <form th:id="'reply-form-'+${reply.id}" class="comment-form reply-form" th:action="@{/writeComment/{boardId}(boardId=${board.id})}" method="post">
+                                <input type="hidden" name="parentId" th:value="${reply.id}"/>
+                                <textarea name="content" placeholder="대댓글을 입력하세요"></textarea>
+                                <button type="submit">대댓글 작성</button>
+                            </form>
+
+                            <!-- 재귀적 대댓글 -->
+                            <ul th:if="${#lists.size(reply.replies) > 0}">
+                                <li th:each="nestedReply : ${reply.replies}" class="reply">
+                                    <p>
+                                        <span th:text="${nestedReply.author.name}"></span>:
+                                        <span th:text="${nestedReply.content}"></span>
+
+                                        <!-- 좋아요 -->
+                                    <form th:action="@{/likeComment/{commentId}(commentId=${nestedReply.id})}" method="post" style="display:inline;">
+                                        <input type="hidden" name="memberId" th:value="${member.id}"/>
+                                        <span class="like-icon">&#128077;</span>
+                                        <span th:text="${nestedReply.likes}"></span>
+                                    </form>
+
+                                    <!-- 싫어요 -->
+                                    <form th:action="@{/unlikeComment/{commentId}(commentId=${nestedReply.id})}" method="post" style="display:inline;">
+                                        <input type="hidden" name="memberId" th:value="${member.id}"/>
+                                        <span class="like-icon">&#128078;</span>
+                                        <span th:text="${nestedReply.unlikes}"></span>
+                                    </form>
+                                    </p>
+                                    <!-- 대댓글 작성 버튼 -->
+                                    <button class="reply-button" th:data-comment-id="${nestedReply.id}">대댓글 작성</button>
+
+                                    <!-- 대댓글 작성 폼 (기본적으로 숨김) -->
+                                    <form th:id="'reply-form-'+${nestedReply.id}" class="comment-form reply-form" th:action="@{/writeComment/{boardId}(boardId=${board.id})}" method="post">
+                                        <input type="hidden" name="parentId" th:value="${nestedReply.id}"/>
+                                        <textarea name="content" placeholder="대댓글을 입력하세요"></textarea>
+                                        <button type="submit">대댓글 작성</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<a th:if="${member != null && board.author.id == member.id}" th:href="@{/board/modify/{id}(id=${board.id})}">
+    <button>수정</button>
+</a>
+
+<!-- Footer -->
+<footer class="footer">
+    <form th:action="@{/members/home}" method="get">
+        <button type="submit">홈으로</button>
+    </form>
+    <p class="text-muted small mb-0">© 나현호 블로그</p>
+</footer>
+
+<!-- Core theme JS -->
+<script src="/js/scripts.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.reply-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.getAttribute('data-comment-id');
+                const formId = 'reply-form-' + commentId;
+                const form = document.getElementById(formId);
+                if (form) {
+                    form.style.display = form.style.display === 'block' ? 'none' : 'block';
+                }
+            });
+        });
+
+        document.querySelectorAll('.reply-toggle-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.getAttribute('data-comment-id');
+                const sectionId = 'reply-section-' + commentId;
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.style.display = section.style.display === 'block' ? 'none' : 'block';
+                    this.textContent = section.style.display === 'block' ? '댓글 숨기기' : '댓글 보기';
+                }
+            });
+        });
+
+        document.querySelectorAll('.like-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                this.closest('form').submit();
+            });
+        });
+    });
+</script>
+</body>
+</html>

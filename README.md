@@ -47,6 +47,6 @@
 <details>
 <summary>ERD</summary>
 <div markdown="1" style="padding-left: 15px;">
-<img src="" width="800px"/>
+<img src="https://github.com/hyunhod/board/blob/cbd2069b41cf343541f835a5113ef677ef97389c/Board.png" width="800px"/>
 </div>
 </details>

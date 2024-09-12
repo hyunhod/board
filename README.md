@@ -42,4 +42,11 @@
 - **데이터베이스**: Oracle
 - **버전 관리**: Git, GitHub
 
-## 프로젝트 구조
+## ERD
+
+<details>
+<summary>ERD</summary>
+<div markdown="1" style="padding-left: 15px;">
+<img src="" width="800px"/>
+</div>
+</details>
